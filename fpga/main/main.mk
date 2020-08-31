@@ -1,6 +1,13 @@
 OUT_DIR	:=	output
 export OUT_DIR
 
+VIVADO_default := /home/abyszuk/opt/Xilinx/Vivado/2019.1/bin/vivado
+
+ifeq ($(VIVADO),)
+	VIVADO := VIVADO_default
+	@echo "$VIVADO variable not set, choose default one: $(VIVADO_default)"
+endif
+
 .PHONY:	all
 all:
 ifneq ($(wildcard ./$(OUT_DIR)/),)
@@ -9,7 +16,7 @@ else
 	@mkdir $(OUT_DIR)
 	@echo "Start building the $(PROJECT)...."
 	# After tclargs, we add all the custom options by tcl arguments
-	vivado	-mode batch	\
+	$(VIVADO)	-mode batch	\
 		-notrace \
 		-nojournal	\
 		-source	tcl/run.tcl	\
@@ -25,7 +32,7 @@ endif
 
 .PHONY:	mcs
 mcs:
-	vivado -mode batch \
+	$(VIVADO) -mode batch \
 		-notrace \
 		-nojournal \
 		-source tcl/write_cfgmem.tcl \
@@ -39,7 +46,7 @@ mcs:
 
 .PHONY:	program_mcs
 program_mcs:
-	vivado -mode batch \
+	$(VIVADO) -mode batch \
 		-notrace \
 		-nojournal \
 		-source tcl/program_mcs.tcl	\
