@@ -65,7 +65,7 @@ pathmunge() {
 pathmunge "$RISCV_PATH"
 EOF
 	fi
-source ~/.bashrc
+echo "PATH variable updated! type 'source ~/.bashrc' to make it visible!"
 }
 
 
