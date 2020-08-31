@@ -6,7 +6,7 @@ RUN apt-get update && \
 
 COPY . /rv
 
-COPY verilator_bins/* /usr/bin/
+COPY verilator_bins.veri/* /usr/bin/
 
 RUN mkdir -p /usr/local/share/verilator/bin/
 RUN mkdir -p /usr/local/share/verilator/include/vltstd/
@@ -16,9 +16,10 @@ COPY include.veri/* /usr/local/share/verilator/include/
 COPY vltstd.veri/* /usr/local/share/verilator/include/vltstd/
 COPY bin.veri/* /usr/local/share/verilator/bin/
 
+
 RUN cd /rv && \
-    make run
-    # make JTAG_BOOT=1 JTAG_PORT=8080 MAX_THREAD=4 verilator
+	make JTAG_BOOT=1 JTAG_PORT=8080 MAX_THREAD=1 verilator 
+
 EXPOSE 8080/tcp
 WORKDIR /rv/output_verilator
 
