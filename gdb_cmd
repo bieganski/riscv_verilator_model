@@ -1,0 +1,13 @@
+set arch riscv:rv32
+set remote hardware-breakpoint-limit 4
+target extended-remote localhost:3333
+set mem inaccessible-by-default off
+
+file sw/hello_world/output/hello_world.elf
+
+load
+# layout split
+
+thb main
+si
+cont
