@@ -1,6 +1,7 @@
-# Warning:
+# `warning` `warning` `warning`:
 That file comes from original `/aignacio/riscv_verilator_model` repository.
-Keep in mind, that there are some problems with it, and probably you want to read `SETUP.md` file first (it contains working machinery for both `FPGA` and `verilator` environments).
+Keep in mind, that there are some problems with it, and probably you want to read [SETUP.md](./SETUP.md) file first (it contains working machinery for both `FPGA` and `verilator` environments).
+***
 
 # RISC-V Verilator model
 

@@ -126,6 +126,8 @@ int main(void) {
     setup_irqs();
     start_timer();
 
+    printf("Hello from RI5CY core!\n");
+
     while(1){
         if (run_leds)
             loop_leds();

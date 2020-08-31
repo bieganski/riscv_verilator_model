@@ -17,8 +17,9 @@ COPY vltstd.veri/* /usr/local/share/verilator/include/vltstd/
 COPY bin.veri/* /usr/local/share/verilator/bin/
 
 
+# FIXME: it doesn't compile with MAX_THREAD=1, why?
 RUN cd /rv && \
-	make JTAG_BOOT=1 JTAG_PORT=8080 MAX_THREAD=1 verilator 
+	make JTAG_BOOT=1 JTAG_PORT=8080 MAX_THREAD=2 verilator 
 
 EXPOSE 8080/tcp
 WORKDIR /rv/output_verilator
