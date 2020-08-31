@@ -17,9 +17,11 @@ else
 fi
 
 install_riscv_toolchain() {
+	echo "### riscv toolchain installing started..."
 	sudo $PKG_INSTALL_CMD npm
 	sudo npm install --global xpm@latest
 	xpm install --global @xpack-dev-tools/riscv-none-embed-gcc@latest
+	echo "### riscv toolchain installed successfully!"
 }
 
 
@@ -31,19 +33,20 @@ find_riscv_path() {
 	RISCV_PATH=`find $(pwd) -type d | grep content/bin`
 	if [ ! -d "$RISCV_PATH" ]
 	then
-		echo "Error: could not find RiscV toolchain in ~/opt/path, check xpm bin directory"
+		echo "### Error: could not find RiscV toolchain in ~/opt/path, check xpm bin directory"
 		popd > /dev/null
 		exit 1
 	fi
-	echo "## RISCV toolchain installed found in $RISCV_PATH"
+	echo "### RISCV toolchain installed found in $RISCV_PATH"
 	popd > /dev/null
 }
 
 
 
 add_to_path() {
+	echo "### Adding riscv toolchain location to \$PATH variable..."
 	if [ ! -f "$HOME/.bashrc" ]; then
-		echo "Error: cannot find .bashrc file!"
+		echo "### Error: cannot find .bashrc file!"
 		exit 1
 	fi
 
@@ -65,11 +68,24 @@ pathmunge() {
 pathmunge "$RISCV_PATH"
 EOF
 	fi
-echo "PATH variable updated! type 'source ~/.bashrc' to make it visible!"
+echo "### PATH variable updated! type 'source ~/.bashrc' to make it visible!"
 }
 
+update_submodules() {
+	echo "### Update git submodules..."
+	git submodule update --init --recursive
+	echo "### Git submodules updated successfully!"
+}
+
+
+end_msg() {
+	echo "### setup.sh finished correctly, now perform next steps from SETUP.md,"
+	echo "    depending on architecture you will be using (qemu or FPGA)."
+}
 
 check_not_sudo
 install_riscv_toolchain
 find_riscv_path
 add_to_path
+update_submodules
+end_msg

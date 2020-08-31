@@ -21,10 +21,16 @@ After compiling `verilator 4.018` from source, we obtain several files (mainly b
 All of them are needed inside Docker container to work properly, thus they are copied before running.
 You can run binary in container in two ways. Compiling it on host (remember about `VERILAT=1` flag!) and copying to image, or compile it inside image, i.a. using `make sw` command.
 
-`.elf`'s paths are passed as arguments to `riscv_soc` program
+`.elf`'s paths are passed as arguments to `riscv_soc` program throught `Dockerfile` like this:
 ```
 CMD ./riscv_soc /rv/sw/hello_world/output/hello_world.elf
 ```
+
+Finally, you can run all machinery with command
+```
+docker compose up --build
+```
+
 
 ## `FPGA` config
 

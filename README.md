@@ -1,3 +1,7 @@
+# Warning:
+That file comes from original `/aignacio/riscv_verilator_model` repository.
+Keep in mind, that there are some problems with it, and probably you want to read `SETUP.md` file first (it contains working machinery for both `FPGA` and `verilator` environments).
+
 # RISC-V Verilator model
 
 Build a complete SoC using the well-known risc-v [RI5CY](https://github.com/pulp-platform/riscv) CPU from pulp team in verilator or play on real targets such as FPGAs.
