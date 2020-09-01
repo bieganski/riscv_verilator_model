@@ -4,8 +4,8 @@ export OUT_DIR
 VIVADO_default := /home/abyszuk/opt/Xilinx/Vivado/2019.1/bin/vivado
 
 ifeq ($(VIVADO),)
-	VIVADO := VIVADO_default
-	@echo "$VIVADO variable not set, choose default one: $(VIVADO_default)"
+VIVADO := $(VIVADO_default)
+@echo "$VIVADO variable not set, choose default one: $(VIVADO_default)"
 endif
 
 .PHONY:	all
