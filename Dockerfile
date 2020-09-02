@@ -19,9 +19,10 @@ COPY bin.veri/* /usr/local/share/verilator/bin/
 
 # FIXME: it doesn't compile with MAX_THREAD=1, why?
 RUN cd /rv && \
-	make JTAG_BOOT=1 JTAG_PORT=8080 MAX_THREAD=2 verilator 
+	make JTAG_BOOT=1 JTAG_PORT=8080 MAX_THREAD=12 verilator 
 
 EXPOSE 8080/tcp
 WORKDIR /rv/output_verilator
 
-CMD ./riscv_soc /rv/sw/hello_world/output/hello_world.elf
+CMD ./riscv_soc 
+# sw/hello_world/output/hello_world.elfs

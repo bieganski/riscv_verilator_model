@@ -8,6 +8,6 @@ file sw/hello_world/output/hello_world.elf
 load
 # layout split
 
-thb main
+thb main.c:141
 si
 cont

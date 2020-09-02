@@ -275,7 +275,7 @@ program_mcs:
 
 openocd_fpga:
 	# riscv-openocd -f tb/debug/esp-prog.cfg -f tb/debug/riscv_pulp_fpga.cfg
-	riscv-openocd -f olimex-arm-usb-tiny-h.cfg -f tb/debug/riscv_pulp_fpga.cfg
+	openocd -f olimex-arm-usb-tiny-h.cfg -f tb/debug/riscv_pulp_fpga.cfg
 
 clean_fpga:
 	+@make -C fpga clean
