@@ -1,5 +1,6 @@
 # SHELL := /bin/bash
-RISCV_TOOLCHAIN ?=	riscv-none-embed
+RISCV_TOOLCHAIN ?=	riscv32-unknown-elf
+# riscv-none-embed
 export RISCV_TOOLCHAIN
 ##### Project variables
 PROJECT_NAME	:=	riscv

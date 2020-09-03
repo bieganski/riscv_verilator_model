@@ -128,7 +128,7 @@ int main(void) {
 
     printf("####### hello from RISCY\n");
 
-
+/*
 asm volatile (
 "csrw 0x782,x0\n"
 "lp.setupi x1,100,stop_loop\n"
@@ -136,7 +136,7 @@ asm volatile (
 "stop_loop: add x11,x11,x10\n"
 "csrr x15,0x782\n"
 );
-
+*/
     while(1){
         if (run_leds)
             loop_leds();
