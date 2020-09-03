@@ -28,8 +28,8 @@ ENTRY( _start )
 
 MEMORY
 {
-  IRAM(rxai!w) : ORIGIN = 0x20000000, LENGTH = 32K
-  DRAM(wxa!ri) : ORIGIN = 0x30000000, LENGTH = 32K
+  IRAM(rxai!w) : ORIGIN = 0x20000000, LENGTH = 128K
+  DRAM(wxa!ri) : ORIGIN = 0x30000000, LENGTH = 128K
 }
 
 _stack_size = 0x2000; /* 8k */
@@ -92,7 +92,12 @@ SECTIONS
 }
 
 PROVIDE(_start_stack = ORIGIN(DRAM) + LENGTH(DRAM));
+
+PROVIDE(stack = _start_stack); /* libgloss */
+
 PROVIDE(_end_stack = ORIGIN(DRAM) + (LENGTH(DRAM) - _stack_size));
 PROVIDE(_start_heap = __BSS_END__);
 PROVIDE(_end_heap = _end_stack);
 PROVIDE(end = _start_heap);
+
+PROVIDE(_end = _end_heap); /* libgloss */

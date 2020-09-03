@@ -126,7 +126,8 @@ int main(void) {
     setup_irqs();
     start_timer();
 
-    printf("####### hello from RISCY\n");
+//    printf("####### hello from RISCY\n");
+    uart_sendchar('c');
 
 /*
 asm volatile (

@@ -1,4 +1,4 @@
-PREFIX	?=	riscv-none-embed-
+PREFIX	?=	riscv32-unknown-elf-
 CC			:=	$(PREFIX)gcc
 OBJDUMP	:=	$(PREFIX)objdump
 OBJCOPY	:=	$(PREFIX)objcopy
@@ -12,7 +12,7 @@ CFLAGS	:=	-march=rv32imc 			\
 						-Wno-unused 				\
 						-ffreestanding			\
 						-O0 -g							\
-						--specs=nano.specs	\
+# 						--specs=nano.specs	\
 						-Wall -Wno-main
 						# -mstrict-align = Add this to avoid misaligned access
 LDFLAGS	:=	-g 												\
@@ -21,7 +21,7 @@ LDFLAGS	:=	-g 												\
 						-march=rv32imc 						\
 						-mabi=ilp32 							\
 						-nostartfiles 						\
-						--specs=nano.specs 				\
+#						--specs=nano.specs 				\
 						--specs=nosys.specs 			\
 						-lm -lc -lgcc
 
