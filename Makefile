@@ -274,7 +274,7 @@ program_mcs:
 	+@make -C fpga $@
 
 openocd_fpga:
-	riscv-openocd -f tb/debug/esp-prog.cfg -f tb/debug/riscv_pulp_fpga.cfg
+	riscv-openocd -f olimex-arm-usb-tiny-h.cfg  -f tb/debug/riscv_pulp_fpga.cfg
 
 clean_fpga:
 	+@make -C fpga clean
@@ -308,6 +308,11 @@ openocd:
 
 gdb: sw
 	$(RISCV_TOOLCHAIN)-gdb sw/$(TEST_PROG)/output/$(TEST_PROG).elf -ex "target remote : 3333" -ex "load" -ex "c"
+
+
+gdb_fpga:
+	+@make -C sw/$(TEST_PROG) VERILAT=0 all
+	$(RISCV_TOOLCHAIN)-gdb -x gdb_cmd
 
 clean:
 	$(info Cleaning verilator simulation files...)
