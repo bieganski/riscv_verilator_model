@@ -62,7 +62,7 @@ void __attribute__((naked,__section__(".init"))) _start(void) {
 void __attribute__((weak)) isr_synctrap(void) {
     static uint32_t synctrap_cause = 0;
     asm volatile("csrr %0,mcause" : "=r"(synctrap_cause));
-    asm volatile("ebreak");
+//    asm volatile("ebreak");
 }
 
 void __attribute__((weak)) isr_m_external(void) {

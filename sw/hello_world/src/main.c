@@ -1,7 +1,7 @@
-#include <stdbool.h>
-#include <stdio.h>
-#include <stdint.h>
-#include <string.h>
+//#include <stdbool.h>
+// #include <stdio.h>
+//#include <stdint.h>
+//#include <string.h>
 
 #include "riscv_soc_utils.h"
 #include "gpio.h"
@@ -10,12 +10,18 @@
 #include "encoding.h"
 #include "timer.h"
 
+
+#include "printf.h"
+
 #define SW_0    1 << 28
 #define SW_1    1 << 29
 #define SW_2    1 << 30
 #define SW_3    1 << 31
 
-bool run_leds = false;
+int run_leds = 0;
+
+typedef int size_t;
+#define NULL ((void*) 0)
 
 extern uint32_t  _start;
 volatile uint32_t* const printf_buffer = (uint32_t*) PRINTF_VERILATOR;
@@ -108,6 +114,11 @@ void setup_gpios(){
     enable_gpio_pins_read(SW_0|SW_1|SW_2|SW_3);
 }
 
+
+void dummy_putc(void* ptr, char c) {
+	uart_sendchar(c);
+}
+
 int main(void) {
     // Set the reset address to the entry point
     volatile uint32_t *address_rst = (uint32_t *)RST_CTRL_BASE_ADDR;
@@ -122,14 +133,16 @@ int main(void) {
     // 7 => 117187 ~> 115200
     uart_set_cfg(0, 7);
 
+
+	init_printf(NULL, dummy_putc);
+
     setup_gpios();
     setup_irqs();
     start_timer();
 
-//    printf("####### hello from RISCY\n");
-    uart_sendchar('c');
+    tfp_printf("####### hello from RISCY\n");
 
-/*
+
 asm volatile (
 "csrw 0x782,x0\n"
 "lp.setupi x1,100,stop_loop\n"
@@ -137,7 +150,7 @@ asm volatile (
 "stop_loop: add x11,x11,x10\n"
 "csrr x15,0x782\n"
 );
-*/
+
     while(1){
         if (run_leds)
             loop_leds();

@@ -1,17 +1,24 @@
-PREFIX	?=	riscv32-unknown-elf-
-CC			:=	$(PREFIX)gcc
+# PREFIX       ?=      riscv-none-embed-
+PREFIX ?=      riscv32-unknown-elf-
+CC     :=      $(PREFIX)gcc
+LD     :=      $(CC)
+
 OBJDUMP	:=	$(PREFIX)objdump
 OBJCOPY	:=	$(PREFIX)objcopy
 GDB			:=	$(PREFIX)gdb
 SIZE		:=	$(PREFIX)size
 VERILAT	?=	0
 
-CFLAGS	:=	-march=rv32imc 			\
+
+ARCH   :=       rv32imfcxpulpv2
+
+CFLAGS	:=	-march=$(ARCH) 			\
 						-mabi=ilp32 				\
 						-Wall 							\
 						-Wno-unused 				\
 						-ffreestanding			\
 						-O0 -g							\
+						-specs=nosys.specs	\
 # 						--specs=nano.specs	\
 						-Wall -Wno-main
 						# -mstrict-align = Add this to avoid misaligned access
@@ -69,7 +76,7 @@ $(TARGET).bin:	$(TARGET).elf
 
 $(TARGET).elf:	$(OBJ)
 	@echo "Linking $@"
-	$(CC) $(LD_SCRIPT) -I$(INC_API) -I$(INC) $(OBJ) -o $@ $(LDFLAGS)
+	$(LD) $(LD_SCRIPT) -I$(INC_API) -I$(INC) $(OBJ) -o $@ $(LDFLAGS)
 
 $(TEMP)/%.o:	init/%.S
 	@echo "Building $@"
