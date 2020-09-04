@@ -17,7 +17,7 @@ CFLAGS	:=	-march=$(ARCH) 			\
 						-Wall 							\
 						-Wno-unused 				\
 						-ffreestanding			\
-						-O0 -g							\
+						-O3 -g							\
 						-specs=nosys.specs	\
 # 						--specs=nano.specs	\
 						-Wall -Wno-main

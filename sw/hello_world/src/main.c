@@ -152,6 +152,11 @@ void test_cycles_instrs(const char* descr, void (*f) (void)) {
     tfp_printf("==== Benchmark end ====\r\n");
 }
 
+volatile unsigned int a[32];
+volatile unsigned int b[32];
+
+void test();
+
 
 int main(void) {
     // Set the reset address to the entry point
@@ -176,6 +181,12 @@ int main(void) {
     tfp_printf("####### hello from RISCY\r\n");
 
 
+    for (int i = 0; i < 32; i++) {
+        a[i] = i + (i << 4) + (i << 8);
+        b[i] = i ^ 0xdeadbeef;
+    }
+
+
 
     volatile int priv = read_csr(0xCC1);
 
@@ -196,19 +207,36 @@ int main(void) {
     test_cycles_instrs("xor+popcount: standard loop/post-increment load", bmark_standard_loop_postinc_load_pcnt);
     test_cycles_instrs("xor+popcount: hw loop/post-increment load", bmark_hw_loop_postinc_load_pcnt);
 
+    test_cycles_instrs("### test", test);
+
 
 
     do_loop();
     
+
+    return 0;
+}
+
+void test() {
+    asm volatile(
+        "li t3, 10\n"
+        "li t4, 100\n"
+        "li t5, 1000\n"
+    );
+
+// "lw t3, 0(sp)\n"
+//     "lw t4, 4(sp)\n"
+        //"p.cnt t2, t4\n"
 }
 
 
 void bmark_standard_loop_standard_load_pcnt() {
-    volatile unsigned int a[32];
-    volatile unsigned int b[32];
 
     asm volatile(
+    "lw x10, (%0)\n"
+    "lw x11, (%1)\n"
     "li x5, 0\n"
+    "li t6, 0\n"
     "li x4, 32\n"
     "Lstart1:\n"
     "lw t3, 0(x10)\n"
@@ -218,40 +246,43 @@ void bmark_standard_loop_standard_load_pcnt() {
     "addi x10,x10,4\n"
     "addi x11,x11,4\n"
     "addi x5,x5,1\n"
-    "bne x4,x5,Lstart1"
+    "add t6, t6, t5\n"
+    "bne x4,x5,Lstart1" : : "rm"(a), "rm"(b)
     );
 }
 
 
 void bmark_standard_loop_postinc_load_pcnt() {
-    volatile unsigned int a[32];
-    volatile unsigned int b[32];
 
     asm volatile(
+    "lw x10, (%0)\n"
+    "lw x11, (%1)\n"
     "li x5, 0\n"
     "li x4, 32\n"
+    "li t6, 0\n"
     "Lstart2:\n"
     "p.lw t3,4(x10!)\n"
     "p.lw t4,4(x11!)\n"
     "xor t5,t3,t4\n"
     "p.cnt t5,t5\n"
     "addi x5,x5,1\n"
-    "bne x4,x5,Lstart2"
+    "add t6, t6, t5\n"
+    "bne x4,x5,Lstart2"  : : "rm"(a), "rm"(b)
     );
 }
 
 
 void bmark_hw_loop_postinc_load_pcnt() {
-    volatile unsigned int a[32];
-    volatile unsigned int b[32];
 
     asm volatile(
-    "li x5, 0\n"
-    "li x4, 32\n"
+    "lw x10, (%0)\n"
+    "lw x11, (%1)\n"
+    "li t6, 0\n"
     "lp.setupi x1,32,stop_loop\n"
     "p.lw t3,4(x10!)\n"
     "p.lw t4,4(x11!)\n"
     "xor t5,t3,t4\n"
-    "stop_loop: p.cnt t5,t5\n"
+    "p.cnt t5,t5\n"
+    "stop_loop: add t6, t6, t5"  : : "rm"(a), "rm"(b)
     );
 }
