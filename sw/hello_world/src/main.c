@@ -23,6 +23,10 @@ int run_leds = 0;
 typedef int size_t;
 #define NULL ((void*) 0)
 
+void bmark_standard_loop_standard_load_pcnt();
+void bmark_standard_loop_postinc_load_pcnt();
+void bmark_hw_loop_postinc_load_pcnt();
+
 extern uint32_t  _start;
 volatile uint32_t* const printf_buffer = (uint32_t*) PRINTF_VERILATOR;
 
@@ -114,15 +118,44 @@ void setup_gpios(){
     enable_gpio_pins_read(SW_0|SW_1|SW_2|SW_3);
 }
 
-
 void dummy_putc(void* ptr, char c) {
 	uart_sendchar(c);
 }
 
+unsigned long read_cycles(void)
+{
+    unsigned long cycles;
+    asm volatile ("rdcycle %0" : "=r" (cycles));
+    return cycles;
+}
+
+void do_loop() {
+    while(1){
+        if (run_leds)
+            loop_leds();
+    }
+}
+
+void test_cycles_instrs(const char* descr, void (*f) (void)) {
+    volatile int c0, c1, i0, i1;
+
+    #define READ_INSTR 0x781
+    #define READ_CYC 0x780
+
+    tfp_printf("==== Benchmark '%s' ====\r\n", descr);  
+    c0 = read_csr(0x780);
+    i0 = read_csr(0x781);
+    f();
+    c1 = read_csr(0x780);
+    i1 = read_csr(0x781);
+    tfp_printf("CYCLES: %d, INSTRS:%d\r\n", c1 - c0, i1 - i0);
+    tfp_printf("==== Benchmark end ====\r\n");
+}
+
+
 int main(void) {
     // Set the reset address to the entry point
     volatile uint32_t *address_rst = (uint32_t *)RST_CTRL_BASE_ADDR;
-    int test = 0;
 
     *(address_rst) = (uint32_t )&_start;
 
@@ -137,23 +170,88 @@ int main(void) {
 	init_printf(NULL, dummy_putc);
 
     setup_gpios();
-    setup_irqs();
-    start_timer();
+//    setup_irqs();
+//   start_timer();
 
-    tfp_printf("####### hello from RISCY\n");
+    tfp_printf("####### hello from RISCY\r\n");
 
 
-asm volatile (
-"csrw 0x782,x0\n"
-"lp.setupi x1,100,stop_loop\n"
-"p.lw x10,4(x14!)\n"
-"stop_loop: add x11,x11,x10\n"
-"csrr x15,0x782\n"
-);
 
-    while(1){
-        if (run_leds)
-            loop_leds();
-	// printf("%d\n", run_leds);
-    }
+    volatile int priv = read_csr(0xCC1);
+
+    tfp_printf("SAVED CC1: %d\r\n", priv);
+
+    int val = 1 + (2) + (1 << 5);
+    write_csr(0xCC0, val);
+
+    // TODO if it returns all zeros please uncomment that
+    // TODO why??
+    asm volatile (
+		"csrw 0x785,x0\n" 
+    );
+
+    tfp_printf("========= Benchmarking xor+popcount on two 32 vectors of 4byte elements =========\r\n");
+
+    test_cycles_instrs("xor+popcount: standard loop/standard load", bmark_standard_loop_standard_load_pcnt);
+    test_cycles_instrs("xor+popcount: standard loop/post-increment load", bmark_standard_loop_postinc_load_pcnt);
+    test_cycles_instrs("xor+popcount: hw loop/post-increment load", bmark_hw_loop_postinc_load_pcnt);
+
+
+
+    do_loop();
+    
+}
+
+
+void bmark_standard_loop_standard_load_pcnt() {
+    volatile unsigned int a[32];
+    volatile unsigned int b[32];
+
+    asm volatile(
+    "li x5, 0\n"
+    "li x4, 32\n"
+    "Lstart1:\n"
+    "lw t3, 0(x10)\n"
+    "lw t4, 0(x11)\n"
+    "xor t5,t3,t4\n"
+    "p.cnt t5,t5\n"
+    "addi x10,x10,4\n"
+    "addi x11,x11,4\n"
+    "addi x5,x5,1\n"
+    "bne x4,x5,Lstart1"
+    );
+}
+
+
+void bmark_standard_loop_postinc_load_pcnt() {
+    volatile unsigned int a[32];
+    volatile unsigned int b[32];
+
+    asm volatile(
+    "li x5, 0\n"
+    "li x4, 32\n"
+    "Lstart2:\n"
+    "p.lw t3,4(x10!)\n"
+    "p.lw t4,4(x11!)\n"
+    "xor t5,t3,t4\n"
+    "p.cnt t5,t5\n"
+    "addi x5,x5,1\n"
+    "bne x4,x5,Lstart2"
+    );
+}
+
+
+void bmark_hw_loop_postinc_load_pcnt() {
+    volatile unsigned int a[32];
+    volatile unsigned int b[32];
+
+    asm volatile(
+    "li x5, 0\n"
+    "li x4, 32\n"
+    "lp.setupi x1,32,stop_loop\n"
+    "p.lw t3,4(x10!)\n"
+    "p.lw t4,4(x11!)\n"
+    "xor t5,t3,t4\n"
+    "stop_loop: p.cnt t5,t5\n"
+    );
 }

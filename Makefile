@@ -312,8 +312,9 @@ gdb: sw
 
 
 gdb_fpga:
-	+@make -C sw/$(TEST_PROG) VERILAT=0 all
-	$(RISCV_TOOLCHAIN)-gdb -x gdb_cmd
+	+@make -B -C sw/$(TEST_PROG) VERILAT=0 all
+#	$(RISCV_TOOLCHAIN)-gdb -x gdb_cmd
+	riscv-none-embed-gdb -x gdb_cmd
 
 clean:
 	$(info Cleaning verilator simulation files...)
